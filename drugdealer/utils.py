@@ -1,0 +1,4 @@
+
+def formatRecord(OneRecordDataframe):
+	pass
+
