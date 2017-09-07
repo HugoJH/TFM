@@ -1,4 +1,4 @@
-from drugdealer.FingerPrinter import FingerPrinter
+from drugdealer.fingerprinter import FingerPrinter
 
 class testFingerPrintCreator():
     
@@ -18,7 +18,7 @@ class testFingerPrintCreator():
         self.topologicalFingerPrint = pickle.load(file=TopologicalFile)
         TopologicalFile.close()
         
-        self.FingerPrintCreator = FingerPrintCreator()
+        self.FingerPrintCreator = FingerPrinter()
     
     def test_getTopologicalFingerPrint(self):
     	pass
@@ -28,4 +28,3 @@ class testFingerPrintCreator():
 
     def test_getAtomPairsFingerPrint(self):
         pass
-        
