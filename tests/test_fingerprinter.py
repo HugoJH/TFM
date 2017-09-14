@@ -1,30 +1,41 @@
 from drugdealer.fingerprinter import FingerPrinter
+from rdkit.Chem import MolFromSmiles
+import pytest 
+from pathlib import Path
+from os.path import join,dirname
+import pickle
 
-class testFingerPrintCreator():
-    
-    def setUp(self):
-        self.sampleSMILE = "Cc1cc(ccc1C(=O)c2ccccc2Cl)N3N=CC(=O)NC3=O"
-        self.sampleInchi = "OWRSAHYFSSNENM-UHFFFAOYSA-N"
-        
-        AtomPairsFile = open("mock/AtomPairsFingerPrint.pickle","rb")
-        self.atomPairsFingerPrint = pickle.load(file=AtomPairsFile)
-        AtomPairsFile.close()
-        
-        MorganFile = open("mock/MorganFingerPrint.pickle","rb")
-        self.morganFingerPrint = pickle.load(file=MorganFile)
-        MorganFile.close()
-        
-        TopologicalFile = open("mock/TopologicalFingerPrint.pickle","rb")
-        self.topologicalFingerPrint = pickle.load(file=TopologicalFile)
-        TopologicalFile.close()
-        
-        self.FingerPrintCreator = FingerPrinter()
-    
+class TestFingerprinter:
+
     def test_getTopologicalFingerPrint(self):
-    	pass
+        fingerprinter = FingerPrinter()
+        sampleSMILE = "Cc1cc(ccc1C(=O)c2ccccc2Cl)N3N=CC(=O)NC3=O"
+
+        topologicalFile = open(str(Path(join(dirname(__file__), "mock/TopologicalFingerPrint.pickle")).resolve()), "rb")
+        topologicalFingerPrint = pickle.load(file=topologicalFile)
+        topologicalFile.close()
+
+        fingerprint = fingerprinter.getTopologicalFingerPrint(mol=MolFromSmiles(sampleSMILE))
+        assert fingerprint == topologicalFingerPrint
 
     def test_getMorganFingerPrint(self):
-    	pass
+        fingerprinter = FingerPrinter()
+        sampleSMILE = "Cc1cc(ccc1C(=O)c2ccccc2Cl)N3N=CC(=O)NC3=O"
+
+        morganFile = open(str(Path(join(dirname(__file__), "mock/MorganFingerPrint.pickle")).resolve()), "rb")
+        morganFingerPrint = pickle.load(file=morganFile)
+        morganFile.close()
+
+        fingerprint = fingerprinter.getMorganFingerPrint(mol=MolFromSmiles(sampleSMILE))
+        assert fingerprint == morganFingerPrint
 
     def test_getAtomPairsFingerPrint(self):
-        pass
+        fingerprinter = FingerPrinter()
+        sampleSMILE = "Cc1cc(ccc1C(=O)c2ccccc2Cl)N3N=CC(=O)NC3=O"
+        
+        AtomPairsFile = open(str(Path(join(dirname(__file__),"mock/AtomPairsFingerPrint.pickle")).resolve()), "rb")
+        atomPairsFingerPrint = pickle.load(file=AtomPairsFile)
+        AtomPairsFile.close()
+
+        fingerprint = fingerprinter.getAtomPairsFingerPrint(mol=MolFromSmiles(sampleSMILE))
+        assert fingerprint == atomPairsFingerPrint
