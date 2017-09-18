@@ -1,6 +1,10 @@
-from rdkit.Chem.Fingerprints.FingerprintMols import FingerprintMol as TopologicalFingerPrint 
-from rdkit.Chem.AllChem import GetMorganFingerprint as MorganFingerPrint 
-from rdkit.Chem.AtomPairs.Pairs import GetAtomPairFingerprint as AtomPairFingerPrint
+from rdkit.Chem.Fingerprints.FingerprintMols \
+    import FingerprintMol as TopologicalFingerPrint
+from rdkit.Chem.AllChem \
+    import GetMorganFingerprint as MorganFingerPrint
+from rdkit.Chem.AtomPairs.Pairs \
+    import GetAtomPairFingerprint as AtomPairFingerPrint
+
 
 class FingerPrinter:
 
@@ -8,10 +12,22 @@ class FingerPrinter:
         pass
 
     def getAtomPairsFingerPrint(self, mol):
-        pass
- 
-    def getMorganFingerPrint(self, mol):      
-        pass
+        try:
+            fingerprint = AtomPairFingerPrint(mol)
+            return fingerprint
+        except Exception as e:
+            print("The mol argument is not a rdkit Mol object")
 
-    def getTopologicalFingerPrint(self, mol):      
-        pass
+    def getMorganFingerPrint(self, mol):
+        try:
+            fingerprint = MorganFingerPrint(mol, 2)
+            return fingerprint
+        except Exception as e:
+            print("The mol argument is not a rdkit Mol object")
+
+    def getTopologicalFingerPrint(self, mol):
+        try:
+            fingerprint = TopologicalFingerPrint(mol)
+            return fingerprint
+        except Exception as e:
+            print("The mol argument is not a rdkit Mol object")
