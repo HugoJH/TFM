@@ -33,7 +33,8 @@ class DBPopulator:
         """                           
 
     def targets_from_compound(self, compound_id):
-        pass
+        return (read_sql(sql=self.targets_query % (compound_id), con=self.SQLiteDB)["TARGET"].values.tolist())
+
     def populateDatabase(self):
         pass
 
