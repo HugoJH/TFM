@@ -2,6 +2,7 @@ from sqlite3 import connect
 from pathlib import Path
 from pandas import read_sql
 from drugdealer.utils import formatRecord
+from drugdealer.DBPopulator import DBPopulator
 from os.path import join, dirname
 from pickle import load
 
@@ -10,7 +11,7 @@ def test_formatRecord():
     pathToDB = str(Path(join(dirname(__file__),
                              "../DBs/chembl_22_1.db")).resolve())
     pathToSampleMongoRecord = str(Path(join(dirname(__file__),
-                                            "mock/sampleMongoRecord.json"))
+                                            "mock/sampleMongoRecord.bson"))
                                   .resolve())
 
     con = connect(pathToDB)
@@ -40,8 +41,7 @@ def test_formatRecord():
         """
 
     compound_query_result = read_sql(sql=compound_query, con=con)
-    chembl_id = compound_query_result['chembl_id'][0
-]    
+    chembl_id = compound_query_result['chembl_id'][0]    
     targets = read_sql(sql=targets_query % (chembl_id), con=con)["TARGET"].values.tolist()
 
     sampleMongoRecordFile = open(pathToSampleMongoRecord, "rb")
@@ -50,3 +50,16 @@ def test_formatRecord():
 
 
     assert formatRecord(compound_query_result, targets) == mongoRecord
+
+def test_targets_from_compound():
+    db_populator = DBPopulator()
+    compound_id = "CHEMBL1"
+    pathToSampleTargetsList = str(Path(join(dirname(__file__),
+                                            "mock/sampleTargetsList"))
+                                  .resolve())
+    
+    SampleTargetsListFile = open(pathToSampleTargetsList, "rb")
+    targets_list = load(SampleTargetsListFile)
+    SampleTargetsListFile.close()
+    
+    assert db_populator.targets_from_compound(compound_id) == targets_list
