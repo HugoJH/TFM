@@ -4,23 +4,27 @@ from pickle import dumps
 
 
 def formatRecord(Compound, Targets):
-    mol = Chem.MolFromSmiles(str(Compound['canonical_smiles'][0]))
+    mol = Chem.MolFromSmiles(Compound['canonical_smiles'])
     fingerprinter = FingerPrinter()
-    bson_encoded = ({"CHEMBL_ID": Compound['chembl_id'][0],
+    bson_encoded = ({"CHEMBL_ID": Compound['compound'],
                      "MOL": (dumps(mol)),
-                     "FingerPrint_AtomPairs":
-                     (dumps(fingerprinter.getAtomPairsFingerPrint(mol))),
-                     "FingerPrint_Topological":
-                     (dumps(fingerprinter.getTopologicalFingerPrint(mol))),
-                     "FingerPrint_Morgan":
-                     (dumps(fingerprinter.getMorganFingerPrint(mol))),
-                     "Properties": {"ALOGP": Compound['alogp'][0],
-                                    "PSA": Compound['psa'][0],
-                                    "HBA": Compound['hba'][0],
-                                    "HBD": Compound['hbd'][0],
-                                    "RTB": Compound['rtb'][0]
-                                    },
+                     "FingerPrints": {"Morgan": {"data": dumps(fingerprinter.getMorganFingerPrint(mol)),
+                                                  "length": len(dumps(fingerprinter.getMorganFingerPrint(mol)))
+                                                 },
+                                       "AtomPairs": {"data": dumps(fingerprinter.getAtomPairsFingerPrint(mol)),
+                                                     "length": len(dumps(fingerprinter.getAtomPairsFingerPrint(mol)))
+                                                    },
+                                       "Topological": {"data": dumps(fingerprinter.getTopologicalFingerPrint(mol)),
+                                                       "length": len(dumps(fingerprinter.getTopologicalFingerPrint(mol)))
+                                                      }
+                                     },
+                     "Properties": {"ALOGP": Compound['alogp'],
+                                    "PSA": Compound['psa'],
+                                    "HBA": Compound['hba'],
+                                    "HBD": Compound['hbd'],
+                                    "RTB": Compound['rtb']
+                                    }
                      })
+
     bson_encoded["Targets"] = Targets
-    
     return (bson_encoded)
