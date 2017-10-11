@@ -5,7 +5,7 @@ from rdkit.Chem.AllChem \
 from rdkit.Chem.AtomPairs.Pairs \
     import GetAtomPairFingerprint as AtomPairFingerPrint
 
-
+#Cambiar la generacion de fingerprints por los metodos que crean vector de bits de longitud fija
 class FingerPrinter:
 
     def __init__(self):

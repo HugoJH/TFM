@@ -33,7 +33,7 @@ def test_formatRecord():
 
     targets_query = \
         """ SELECT distinct MD.CHEMBL_ID AS COMPOUND, TD.CHEMBL_ID as TARGET
-            FROM ((((COMPOUND_STRUCTURES CS 
+            FROM ((((COMPOUND_STRUCTURES CS
             INNER JOIN MOLECULE_DICTIONARY MD ON (CS.MOLREGNO = MD.MOLREGNO))
             INNER JOIN ACTIVITIES AC ON (MD.MOLREGNO = AC.MOLREGNO))
             INNER JOIN ASSAYS ASS ON (AC.ASSAY_ID = ASS.ASSAY_ID))
@@ -41,7 +41,7 @@ def test_formatRecord():
         """
 
     compound_query_result = read_sql(sql=compound_query, con=con)
-    chembl_id = compound_query_result['chembl_id'][0]    
+    chembl_id = compound_query_result['chembl_id'][0]
     targets = read_sql(sql=targets_query % (chembl_id), con=con)["TARGET"].values.tolist()
 
     sampleMongoRecordFile = open(pathToSampleMongoRecord, "rb")
@@ -49,7 +49,7 @@ def test_formatRecord():
     sampleMongoRecordFile.close()
 
 
-    assert formatRecord(compound_query_result, targets) == mongoRecord
+    assert formatRecord(compound_query_result.iloc[0,:].to_dict(), targets) == mongoRecord
 
 def test_targets_from_compound():
     db_populator = DBPopulator()
@@ -57,9 +57,9 @@ def test_targets_from_compound():
     pathToSampleTargetsList = str(Path(join(dirname(__file__),
                                             "mock/sampleTargetsList"))
                                   .resolve())
-    
+
     SampleTargetsListFile = open(pathToSampleTargetsList, "rb")
     targets_list = load(SampleTargetsListFile)
     SampleTargetsListFile.close()
-    
+
     assert db_populator.targets_from_compound(compound_id) == targets_list

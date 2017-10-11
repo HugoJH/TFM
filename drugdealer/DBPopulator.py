@@ -43,7 +43,8 @@ class DBPopulator:
         AND compound_properties.hba IS NOT NULL
         AND compound_properties.hbd IS NOT NULL
         AND compound_properties.psa IS NOT NULL
-        AND compound_properties.rtb IS NOT NULL;
+        AND compound_properties.rtb IS NOT NULL
+        AND compound_structures.canonical_smiles IS NOT NULL;
 
         COMMIT;
         """
@@ -67,16 +68,18 @@ class DBPopulator:
         for results in read_sql(sql=self.compound_properties_query,
                                con=self.con,
                                chunksize=self.chunksize):
-            for _, row in results.iterrows():
-                targets = self.targets_from_compound(row['compound'])
-                record = formatRecord(row, targets)
-                documents.append(record)
+            try:
+                for _, row in results.iterrows():
+                    targets = self.targets_from_compound(row['compound'])
+                    record = formatRecord(row, targets)
+                    documents.append(record)
 
+                self.mongoDB['compounds'].insert_many(documents)
+                del documents
+                documents = []
+                print("Conjunto"+ str(i) + "volcado en mongoDB" )
+                i += 1
+            except:
+                pass
+        if documents:
             self.mongoDB['compounds'].insert_many(documents)
-            del documents
-            documents = []
-            print("Conjunto"+ str(i) + "volcado en mongoDB" )
-            i += 1
-        self.mongoDB['compounds'].insert_many(documents)
-        del documents
-        documents = []
