@@ -7,11 +7,10 @@ from pickle import loads
 def demo_calculo_similitud():
 
     db = MongoClient()['DrugDealer']["compounds"]
-    threshold = 0.75
+    threshold = 0.70
     similarity = ComputeSimilarity()
-    sample_molecule = db.find().limit(2444)[1123]
+    sample_molecule = db.find().limit(2444)[12]
     sample_molecule_fingerprint = sample_molecule["FingerPrints"]["AtomPairs"]["data"]
-    print(type(sample_molecule_fingerprint))
     for molecule in db.find():
         try:
             tanimoto = similarity.getTanimotoSimilarity(loads(sample_molecule_fingerprint), loads(molecule["FingerPrints"]["AtomPairs"]["data"]))

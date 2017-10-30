@@ -8,7 +8,7 @@ def formatRecord(Compound, Targets):
     if mol is not None:
 
       fingerprinter = FingerPrinter()
-      bson_encoded = ({"CHEMBL_ID": Compound['chembl_id'],
+      bson_encoded = ({"CHEMBL_ID": Compound['compound'],
                        "MOL": (dumps(mol)),
                        "FingerPrints": {"Morgan": {"data": dumps(fingerprinter.getMorganFingerPrint(mol)),
                                                    "length": len(dumps(fingerprinter.getMorganFingerPrint(mol)))

@@ -17,16 +17,16 @@ class DBPopulator:
         self.preparing_tables_query = """
         DROP TABLE IF EXISTS COMPOUNDS_TARGETS;
         CREATE TABLE COMPOUNDS_TARGETS AS
-        SELECT MOLREGNO, COMPOUND, TARGET, ORGANISM
+        SELECT MOLREGNO, COMPOUND, TARGET
         FROM (
-            SELECT MD.MOLREGNO, MD.CHEMBL_ID as COMPOUND, TD.CHEMBL_ID as TARGET, TD.ORGANISM, COUNT(1) OVER (PARTITION BY TD.CHEMBL_ID) AS cnt
+            SELECT MD.MOLREGNO, MD.CHEMBL_ID as COMPOUND, TD.CHEMBL_ID as TARGET, COUNT(1) OVER (PARTITION BY TD.CHEMBL_ID) AS cnt
             FROM (((MOLECULE_DICTIONARY MD
-            INNER JOIN ACTIVITIES AC ON (MD.MOLREGNO = AC.MOLREGNO))
-            INNER JOIN ASSAYS ASS ON (AC.ASSAY_ID = ASS.ASSAY_ID))
-            INNER JOIN (SELECT * FROM TARGET_DICTIONARY WHERE ORGANISM in ('Homo sapiens', 'Mus musculus', 'Rattus norvegicus')) AS TD ON (ASS.TID = TD.TID))
+            INNER JOIN ACTIVITIES AC ON (MD.MOLREGNO = AC.MOLREGNO AND PCHEMBL_VALUE >= 5))
+            INNER JOIN ASSAYS ASS ON (AC.ASSAY_ID = ASS.ASSAY_ID  AND ASS.ASSAY_ORGANISM='Homo sapiens'))
+            INNER JOIN TARGET_DICTIONARY AS TD ON (ASS.TID = TD.TID))
         ) as v
         WHERE cnt > 20
-        GROUP BY MOLREGNO, COMPOUND, TARGET, ORGANISM;
+        GROUP BY MOLREGNO, COMPOUND, TARGET;
         ALTER TABLE COMPOUNDS_TARGETS ADD CONSTRAINT PK_COMPOUNDS_TARGETS PRIMARY KEY (COMPOUND, TARGET);
         CREATE INDEX IDX_CT_MOLREGNO ON public.compounds_targets USING btree (molregno ASC NULLS LAST) TABLESPACE pg_default;
         CREATE INDEX IDX_CT_MOLREGNO_COMPOUND ON public.compounds_targets USING btree (molregno ASC NULLS LAST, COMPOUND ASC NULLS LAST) TABLESPACE pg_default;
@@ -50,7 +50,7 @@ class DBPopulator:
         """
 
 
-        self.targets_query = """ SELECT TARGET, ORGANISM FROM COMPOUNDS_TARGETS WHERE COMPOUND = '%s' """
+        self.targets_query = """ SELECT TARGET FROM COMPOUNDS_TARGETS WHERE COMPOUND = '%s' """
 
         self.compound_properties_query = """ SELECT * FROM FILTERED_COMPOUND_PROPERTIES """
 
@@ -81,5 +81,6 @@ class DBPopulator:
                 i += 1
             except:
                 pass
+
         if documents:
             self.mongoDB['compounds'].insert_many(documents)
