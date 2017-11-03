@@ -10,6 +10,7 @@ def demo_calculo_similitud():
     threshold = 0.70
     similarity = ComputeSimilarity()
     sample_molecule = db.find().limit(2444)[12]
+    print ("Compuesto de muestra: ",sample_molecule["CHEMBL_ID"])
     sample_molecule_fingerprint = sample_molecule["FingerPrints"]["AtomPairs"]["data"]
     for molecule in db.find():
         try:
